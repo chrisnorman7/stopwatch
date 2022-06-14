@@ -124,18 +124,19 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         actions: [
-          ElevatedButton(
-            onPressed: () => setState(() {
-              _timer?.cancel();
-              _timer = null;
-              _counter = null;
-              paused = false;
-            }),
-            child: const Icon(
-              Icons.restart_alt,
-              semanticLabel: 'Reset',
-            ),
-          )
+          if (timer != null)
+            ElevatedButton(
+              onPressed: () => setState(() {
+                _timer?.cancel();
+                _timer = null;
+                _counter = null;
+                paused = false;
+              }),
+              child: const Icon(
+                Icons.restart_alt,
+                semanticLabel: 'Reset',
+              ),
+            )
         ],
         title: const Text('Stopwatch'),
       ),
