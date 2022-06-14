@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 
 import 'widgets/focus_text.dart';
 
@@ -19,13 +20,16 @@ class MyApp extends StatelessWidget {
 
   // This widget is the root of your application.
   @override
-  Widget build(final BuildContext context) => MaterialApp(
-        title: 'Stopwatch',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-        ),
-        home: const MyHomePage(),
-      );
+  Widget build(final BuildContext context) {
+    RendererBinding.instance.setSemanticsEnabled(true);
+    return MaterialApp(
+      title: 'Stopwatch',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(),
+    );
+  }
 }
 
 /// The widget where the magic happens.
@@ -77,9 +81,12 @@ class _MyHomePageState extends State<MyHomePage> {
     } else if (counter < 0) {
       child = Container(
         alignment: Alignment.center,
-        child: FocusText(
-          text: '${counter.abs()}...',
-          autofocus: true,
+        child: Semantics(
+          liveRegion: true,
+          child: FocusText(
+            text: '${counter.abs()}...',
+            autofocus: true,
+          ),
         ),
       );
     } else {
@@ -90,14 +97,27 @@ class _MyHomePageState extends State<MyHomePage> {
       child = Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          FocusText(text: padNumber(hours)),
-          const Text(':'),
-          FocusText(
-            text: padNumber(minutes),
-            autofocus: true,
+          Semantics(
+            liveRegion: true,
+            child: FocusText(
+              text: padNumber(hours),
+            ),
           ),
           const Text(':'),
-          FocusText(text: padNumber(seconds)),
+          Semantics(
+            liveRegion: true,
+            child: FocusText(
+              text: padNumber(minutes),
+              autofocus: true,
+            ),
+          ),
+          const Text(':'),
+          Semantics(
+            liveRegion: true,
+            child: FocusText(
+              text: padNumber(seconds),
+            ),
+          ),
         ],
       );
     }
