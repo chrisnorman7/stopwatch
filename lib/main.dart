@@ -112,8 +112,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           const Text(':'),
-          FocusText(
-            text: padNumber(seconds),
+          Semantics(
+            liveRegion: seconds == 30,
+            child: FocusText(
+              text: padNumber(seconds),
+            ),
           ),
         ],
       );
