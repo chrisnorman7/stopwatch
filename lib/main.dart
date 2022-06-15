@@ -47,6 +47,7 @@ class MyHomePage extends StatefulWidget {
 /// State for [MyHomePage].
 class _MyHomePageState extends State<MyHomePage> {
   int? _counter;
+  late int _previousCounter;
   Timer? _timer;
   late bool paused;
 
@@ -54,6 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _previousCounter = 0;
     paused = false;
   }
 
@@ -90,6 +92,10 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
     } else {
+      if (counter == 0) {
+        _counter = counter + _previousCounter;
+        _previousCounter = 0;
+      }
       final hours = (counter / 3600).floor();
       final remainder = counter % 3600;
       final minutes = (remainder / 60).floor();
@@ -156,6 +162,10 @@ class _MyHomePageState extends State<MyHomePage> {
           } else {
             setState(() {
               paused = !paused;
+              if (paused == false) {
+                _previousCounter = _counter ?? 0;
+                _counter = -6;
+              }
             });
           }
         },
