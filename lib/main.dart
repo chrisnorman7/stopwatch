@@ -1,9 +1,28 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 
 import 'widgets/focus_text.dart';
+
+/// Whether this system is running Mac OS.
+final isMac = Platform.isMacOS;
+
+/// The pause shortcut.
+final pauseShortcut = SingleActivator(
+  LogicalKeyboardKey.keyP,
+  control: !isMac,
+  meta: isMac,
+);
+
+/// The reset shortcut.
+final resetShortcut = SingleActivator(
+  LogicalKeyboardKey.keyR,
+  control: !isMac,
+  meta: isMac,
+);
 
 /// Return the given [value] as a string padded with zeros.
 String padNumber(final int value) {
@@ -127,52 +146,67 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       );
     }
-    return Scaffold(
-      appBar: AppBar(
-        actions: [
-          if (timer != null)
-            ElevatedButton(
-              onPressed: () => setState(() {
-                _timer?.cancel();
-                _timer = null;
-                _counter = null;
-                paused = false;
-              }),
-              child: const Icon(
-                Icons.restart_alt,
-                semanticLabel: 'Reset',
-              ),
-            )
-        ],
-        title: const Text('Stopwatch'),
-      ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [child],
-      ),
-      floatingActionButton: FloatingActionButton(
-        autofocus: counter == null,
-        onPressed: () {
-          if (timer == null) {
-            _counter = -6;
-            _timer = Timer.periodic(const Duration(seconds: 1), (final timer) {
-              _incrementCounter();
-            });
-            _incrementCounter();
-          } else {
-            setState(() {
-              paused = !paused;
-              if (paused == false) {
-                _previousCounter = _counter ?? 0;
-                _counter = -6;
-              }
-            });
-          }
-        },
-        tooltip: timer == null ? 'Start' : (paused ? 'Resume' : 'Pause'),
-        child:
-            paused == false ? const Icon(Icons.pause) : const Icon(Icons.start),
+    return CallbackShortcuts(
+      bindings: {
+        pauseShortcut: _playPause,
+        resetShortcut: _reset,
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          actions: [
+            if (timer != null)
+              ElevatedButton(
+                onPressed: _reset,
+                child: const Icon(
+                  Icons.restart_alt,
+                  semanticLabel: 'Reset',
+                ),
+              )
+          ],
+          title: const Text('Stopwatch'),
+        ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [child],
+        ),
+        floatingActionButton: FloatingActionButton(
+          autofocus: counter == null,
+          onPressed: _playPause,
+          tooltip: timer == null ? 'Start' : (paused ? 'Resume' : 'Pause'),
+          child: paused == false
+              ? const Icon(Icons.pause)
+              : const Icon(Icons.start),
+        ),
       ),
     );
   }
+
+  void _playPause() {
+    final timer = _timer;
+    if (timer == null) {
+      _counter = -6;
+      _timer = Timer.periodic(
+        const Duration(seconds: 1),
+        (final timer) {
+          _incrementCounter();
+        },
+      );
+      _incrementCounter();
+    } else {
+      setState(() {
+        paused = !paused;
+        if (paused == false) {
+          _previousCounter = _counter ?? 0;
+          _counter = -6;
+        }
+      });
+    }
+  }
+
+  void _reset() => setState(() {
+        _timer?.cancel();
+        _timer = null;
+        _counter = null;
+        paused = false;
+      });
 }
