@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -7,21 +6,16 @@ import 'package:flutter/services.dart';
 
 import 'widgets/focus_text.dart';
 
-/// Whether this system is running Mac OS.
-final isMac = Platform.isMacOS;
-
 /// The pause shortcut.
-final pauseShortcut = SingleActivator(
+const pauseShortcut = SingleActivator(
   LogicalKeyboardKey.keyP,
-  control: !isMac,
-  meta: isMac,
+  control: true,
 );
 
 /// The reset shortcut.
-final resetShortcut = SingleActivator(
+const resetShortcut = SingleActivator(
   LogicalKeyboardKey.keyR,
-  control: !isMac,
-  meta: isMac,
+  control: true,
 );
 
 /// Return the given [value] as a string padded with zeros.
